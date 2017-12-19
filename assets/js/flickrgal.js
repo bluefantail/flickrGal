@@ -1,88 +1,18 @@
-function Flickr(options) {
-	var APIKEY = options.apiKey;
-	var USERID = options.userId;
-	
-	function handleRequest(event) {
-		var request = event.target;
-		var	responseData = JSON.parse(request.responseText);
+var flickrApiKey = '35ca9893a15649318240594ad7dd98e7'; // Change to your flickr api key
+var flickrUserId = '141088533@N02'; // Change to your flickr User ID
 
-		if (request.readyState === XMLHttpRequest.DONE) {
-			if (request.status === 200) {
+// Endpoint url and params
+var endpoint = 'https://api.flickr.com/services/rest/?method=';
+var params = '&format=json'
+	+ '&nojsoncallback=1'
+	+ '&api_key='
+	+ flickrApiKey
+	+ '&user_id='
+	+ flickrUserId;
 
-				switch (request.type){
-					case 'collections':
-						build_collections(responseData);
-						var currentState = imageGrid.childNodes;
-						Array.prototype.forEach.call(currentState, function(node) {
-							prevState.push(node);
-						});
-						break;
-
-					case 'photosets':
-						insert_albums(responseData, request.id);
-						break;
-				}
-			} else {
-				console.log('Flickr ' + request.type + ' request failed!');
-			}
-		}
-	}
-
-	function makeUrl(type, id) {
-		var endpoint = 'https://api.flickr.com/services/rest/?method=';
-
-		// Request methods
-		switch(type) {
-			case 'collections':
-				endpoint += 'flickr.collections.getTree'
-				break;
-			case 'photosets':
-				endpoint += 'flickr.photosets.getPhotos'
-					+ '&photoset_id='
-					+ id
-					+ '&extras=description'
-				break;
-		}
-
-		// Common params
-		endpoint += '&format=json'
-			+ '&nojsoncallback=1'
-			+ '&api_key='
-			+ APIKEY
-			+ '&user_id='
-			+ USERID;
-
-		return endpoint;
-	}
-
-	function makeApiRequest(type, id) {
-		var request 	= new XMLHttpRequest();
-
-		request.open('GET', makeUrl(type, id), true);
-		request.type = type;
-		request.id = id;
-		request.onload = handleRequest;
-		request.send();
-	}
-	
-	return {
-		makeApiRequest: makeApiRequest
-	}
-}
-
-var FlickrGal = {
-	loadGallery: function(options) {
-		if(!options.apiKey) throw "Api key not set";
-	  if(!options.userId) throw "User ID not set";
-		
-		this.gallery = new Flickr({
-			apiKey: options.apiKey,
-			userId: options.userId
-		});
-
-		this.gallery.makeApiRequest('collections');
-	}
-}
+// Request methods
+var methodCollection = 'flickr.collections.getTree';
+var methodPhotos = 'flickr.photosets.getPhotos';
 
 var albums = []; // Stores full album / photoset information
 var lightboxSet = []; // Stores the set of images open in lightbox
@@ -201,6 +131,45 @@ function Element(type){
 	this.title = document.createElement('div');
 	this.desc = document.createElement('div');
 }
+// Send new requests to flickr
+function make_request(requestUrl, type, id){
+	var flickrRequest = new XMLHttpRequest();
+		flickrRequest.open('GET', requestUrl, true);
+		flickrRequest.requestType = type;
+		flickrRequest.requestID = id;
+		flickrRequest.onload = handle_request;
+		flickrRequest.send();
+}
+// Handle flickr requests
+function handle_request(event) {
+	var request = event.target;
+	var	responseData = JSON.parse(request.responseText);
+	var	type = request.requestType;
+	var	targetID = request.requestID;
+	if (request.readyState === XMLHttpRequest.DONE) {
+		if (request.status === 200) {
+			console.log(type + ' request succeed');
+			console.log('Response JSON:');
+			console.log(responseData);
+
+			switch (type){
+				case 'collections':
+					build_collections(responseData);
+					var currentState = imageGrid.childNodes;
+					Array.prototype.forEach.call(currentState, function(node) {
+						prevState.push(node);
+					});
+					console.log(prevState);
+					break;
+				case 'photosets':
+					insert_albums(responseData, targetID);
+					break;
+			}
+		}else{
+			console.log('Flickr ' + requestType + ' request failed!');
+		}
+	}
+};
 // Finds position in albums array for a given id
 function get_album_pos(id){
 	var position = "";
@@ -299,7 +268,14 @@ function build_collections(data) {
 		});
 		// Request images for albums
 		Array.prototype.forEach.call(albums, function(album) {
-			FlickrGal.gallery.makeApiRequest('photosets', album.id);
+			var url = endpoint
+				+ methodPhotos
+				+ '&photoset_id='
+				+ album.id
+				+ params
+				+ '&extras=description';
+
+			make_request(url, 'photosets', album.id);
 		});
 		// Initial gallery fade in
 		gallery.classList.remove('hide');
@@ -442,9 +418,10 @@ if (gallery) {
 
 	// Start Loading the gallery
 	console.log('Requested Collections: ' + set);
-	
-	FlickrGal.loadGallery({
-		apiKey: gallery.getAttribute('data-apikey'),
-		userId: gallery.getAttribute('data-userid')
-	});
+	// Make a collection request
+	var url = endpoint
+		+ methodCollection
+		+ params;
+
+	make_request(url, 'collections');
 }

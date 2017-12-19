@@ -16,25 +16,18 @@ Written purely in javascript, with no external dependencies.
 
 # Usage
 
-To get going with flickrGal, set `flickrApiKey`, and `flickrUserId` in flickrgal.js to the values obtained by requesting your flickr api key. See [flickr's instructions](https://www.flickr.com/services/apps/create) for info on how to request that.
-
-``` javascript
-var flickrApiKey = '35ca9893a15649318240594ad7dd98e7'; // Change to your flickr api key
-var flickrUserId = '141088533@N02'; // Change to your flickr User ID
-```
-
 > Note - remember not to use your api key for anything important in production, I haven't provided any method for storing api keys here. That bit's up to you.
 
-Then simply add the flickrGal div somewhere on your page.
+To get going with flickrGal, simply add the flickrGal div somewhere on your page. You'll need to set `data-apikey` and `data-userid` to the values obtained by requesting your flickr api key. See [flickr's instructions](https://www.flickr.com/services/apps/create) for info on how to request that.
 ``` html
-<div id="flickrgal" data-collections='["all"]'></div>
+<div id="flickrgal" data-collections='["all"]' data-apikey='yourApiKey' data-userid='yourUserId'></div>
 ```
 
 Use the collections data attribute to specify which collections you want to load. `all` will load every photoset from every collection.
 Collections can also be specified individually like so:
 
 ``` html
-<div id="flickrgal" data-collections='["My Collection", "Another Collection"]'></div>
+<div id="flickrgal" data-collections='["My Collection", "Another Collection"]' data-apikey='yourApiKey' data-userid='yourUserId'></div>
 ```
 
 The gallery will expand to the full width of whatever container it's inside, and behave according to the defined grid and breakpoints (more about those in configuration). 
@@ -44,7 +37,7 @@ The gallery will expand to the full width of whatever container it's inside, and
 When displaying all or multiple collections on a single page, an option can be used to seperate collections into sections using the `data-titles` data attribute:
 
 ``` html
-<div id="flickrgal" data-collections='["My Collection", "Another Collection"]' data-titles></div>
+<div id="flickrgal" data-collections='["My Collection", "Another Collection"]' data-titles data-apikey='yourApiKey' data-userid='yourUserId'></div>
 ```
 
 # Configuration

@@ -81,7 +81,7 @@ if (typeof window !== 'undefined') window.FlickrGal = {
 			this.lightboxSet = []; // Stores the set of images open in lightbox
 			this.prevState = []; // Stores objects to be re-inserted later
 
-			window.gallery = $('#flickrgal');
+			window.gallery = document.querySelector('#flickrgal');
 
 		  if (gallery) {
 				// FlickrGal template
@@ -116,13 +116,13 @@ if (typeof window !== 'undefined') window.FlickrGal = {
 				gallery.insertAdjacentHTML('beforeend', imageGridBox);
 				gallery.appendChild(lightboxTemplate);
 
-				gallery.imageGrid = $('#image-grid');
-				var lightbox = $('#lightbox');
+				gallery.imageGrid = document.querySelector('#image-grid');
+				var lightbox = document.querySelector('#lightbox');
 
-				lightbox.image = $('#image-box');
-				lightbox.imageTitle = $('#info > #title');
-				lightbox.imageDesc = $('#info > #description');
-				gallery.loading = $('#loading-gallery');
+				lightbox.image = document.querySelector('#image-box');
+				lightbox.imageTitle = document.querySelector('#info > #title');
+				lightbox.imageDesc = document.querySelector('#info > #description');
+				gallery.loading = document.querySelector('#loading-gallery');
 				// End FlickrGal template
 		  }
 
@@ -162,10 +162,6 @@ if (typeof window !== 'undefined') window.FlickrGal = {
 }
 
 // FUNCTIONS
-// Selectors
-function $(el){
-		return document.querySelector(el);
-}
 //Event Handlers
 function handle_click(event){
 	var el = event.currentTarget;
@@ -422,7 +418,7 @@ function insert_lightbox(id, album){
 
 			// Append divs with large image inserts
 			// Falls back through a few different sizes if high res ones aren't available
-			var largeImageUrl = image.urlK || image.urlH || image.urlC; 
+			var largeImageUrl = image.urlK || image.urlH || image.urlC;
 			newImage.innerHTML = '<div style="background-image: url('
 				+ largeImageUrl
 				+ ')"></div>';
